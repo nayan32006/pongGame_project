@@ -4,6 +4,9 @@ const ctx = canvas.getContext("2d");
 canvas.width = 600;
 canvas.height= 400;
 
+let dx = 3;
+let dy = 3;
+
 // ball
 let x=50;
 let y=50;
@@ -31,6 +34,8 @@ if(paddleY > canvas.height - paddleHeight){
 
 });
 
+
+
 //draw function
 
 
@@ -47,8 +52,8 @@ function draw() {
     ctx.fillRect(10, paddleY, 10, 80);
 
     //move ball
-    x += 2;
-    y += 2;
+    x += dx;
+    y += dy;
 
     //wall collision
     if(y + radius > canvas.height || y-radius < 0){
@@ -57,13 +62,15 @@ function draw() {
 
     //paddle collision
     if (x -radius < 20 && y> paddleY && y < paddleY + paddleHeight) {
-        dx = -dx;
+        dx = Math.abs(dx);
     }
 
     // right wall bounce
     if(x + radius > canvas.width) {
         dx = -dx ;
     }
+
+    
 
     requestAnimationFrame(draw);
 }
@@ -72,5 +79,3 @@ function draw() {
 
 // start game
 draw();
-
-
