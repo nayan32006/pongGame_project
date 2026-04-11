@@ -7,6 +7,8 @@ canvas.height= 400;
 let dx = 3;
 let dy = 3;
 
+let score = 0;
+
 // ball
 let x=50;
 let y=50;
@@ -18,7 +20,7 @@ let radius = 10;
 //paddle
 let paddleWidth = 10;
 let paddleHeight =80;
-let paddleY =150;
+let paddleY =250;
 
 //mouse control
 document.addEventListener("mousemove", function(e) {
@@ -30,6 +32,9 @@ document.addEventListener("mousemove", function(e) {
 if(paddleY < 0) paddleY=0;
 if(paddleY > canvas.height - paddleHeight){
     paddleY = canvas.height - paddleHeight;
+
+if(dx>10) dx=10;
+if(dy>10) dy=10;
 }
 
 });
@@ -51,6 +56,12 @@ function draw() {
     //paddle
     ctx.fillRect(10, paddleY, 10, 80);
 
+    // score count
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "black";
+    ctx.fillText("score:" + score, 250, 30);
+
+
     //move ball
     x += dx;
     y += dy;
@@ -62,7 +73,10 @@ function draw() {
 
     //paddle collision
     if (x -radius < 20 && y> paddleY && y < paddleY + paddleHeight) {
-        dx = Math.abs(dx);
+        // dx = Math.abs(dx);
+        dx = -dx * 1.1;
+        dy = dy * 1.05;
+        score++;
     }
 
     // right wall bounce
@@ -70,7 +84,12 @@ function draw() {
         dx = -dx ;
     }
 
-    
+    // ball paddle miss
+    if(x<0) {
+        alert("Game Over! Score: " + score);
+        document.location.reload();
+    }
+
 
     requestAnimationFrame(draw);
 }
