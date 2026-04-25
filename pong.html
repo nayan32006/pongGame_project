@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pomg Game</title>
+    <style>
+    body {
+     text-align: center;
+     background: black;
+     color: white;
+    }
+
+    canvas {
+     background: black;
+     display: block;
+     margin:  auto;
+     border: 2px solid white;
+    }
+    button {
+     padding: 10px 20px;
+     font-size: 16px;
+     margin-top: 10px;
+   }
+   </style>
+</head>
+<body> 
+
+<h1>Pong Game</h1>
+<button onclick="startGame()"> Start Game</button>
+<button onclick="restartGame()"> Restart</button>
+  
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+
+// ball
+let x=300;
+let y=200;
+let radius = 8;
+let dx = 3;
+let dy = 3;
+
+
+// player paddle
+let paddleWidth = 10;
+let paddleHeight =80;
+let paddleY =150;
+let targetY = 150;
+
+// AI paddle
+let aiY = 150;
+
+// score
+let score = 0;
+
+// Game State
+let gameRunning = false;
+let isPaused = false;
+
+// Mouse Control
+document.addEventListener("mousemove", function(e) {
+  targetY = e.clientY - paddleHeight / 2;
+});
+
+// Pause (P key)
+document.addEventListener("keydown", function(e) {
+  if (e.key === "p") {
+    isPaused = !isPaused;
+  }
+});
+
+
+// start game
+function startGame(){
+    gameRunning = true;
+}
+
+// Restart Game
+function restartGame() {
+  x = 300;
+  y = 200;
+  dx = 3;
+  dy = 3;
+  score = 0;
+  gameRunning = true;
+}
+
+
+// smooth paddle movement
+function updatePaddle() {
+    paddleY += (targetY- paddleY)* 0.2;
+}
+
+// AI Movement
+function updateAI() {
+  aiY += (y - aiY - paddleHeight / 2) * 0.1;
+}
+
+
+// draw player paddle
+function drawPaddle() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(10, paddleY, paddleWidth, paddleHeight);
+}
+
+// Draw AI Paddle
+function drawAIPaddle() {
+  ctx.fillRect(canvas.width - 20, aiY, paddleWidth, paddleHeight);
+}
+
+//draw ball
+function drawBall() {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI *2);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.closePath();
+}
+
+// draw score
+function drawScore() {
+    ctx.font = "20px Arial";
+    ctx.fillText("Score: + score", 20, 30);
+}
+
+    
+
+//game loop
+function draw() {
+    ctx.clearRect(0,0 ,canvas.width ,canvas.height);
+   
+
+    drawPaddle();
+    drawAIPaddle();
+    drawBall();
+    drawScore();
+
+    if (!gameRunning) return;
+    if (isPaused) return;
+
+    updatePaddle();
+    updateAI();
+
+    // ball movement
+    x +=dx;
+    y +=dy;
+
+
+    //wall collision
+    if(y + dy > canvas.height - radius || y+ dy < radius){
+        dy = -dy;
+    }
+
+    // Player Collision
+  if (x - radius < 20 &&
+      y > paddleY &&
+      y < paddleY + paddleHeight) {
+
+    dx = -dx * 1.1;
+    dy = dy * 1.05;
+    score++;
+
+    // Speed limit
+    let maxSpeed = 10;
+    dx = Math.max(-maxSpeed, Math.min(maxSpeed, dx));
+    dy = Math.max(-maxSpeed, Math.min(maxSpeed, dy));
+  }
+
+  // AI Collision
+  if (x + radius > canvas.width - 20 &&
+      y > aiY &&
+      y < aiY + paddleHeight) {
+    dx = -dx;
+  }
+
+  // Game Over
+  if (x < 0) {
+    alert("Game Over! Score: " + score);
+    gameRunning = false;
+  }
+
+  // Right wall bounce
+  if (x + radius > canvas.width) {
+    dx = -dx;
+  }
+}
+
+// Run loop
+setInterval(draw, 16);
+
+</script>
+
+</body>
+</html>
